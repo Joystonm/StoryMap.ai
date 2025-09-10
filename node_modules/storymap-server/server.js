@@ -1,16 +1,23 @@
+require('dotenv').config({ path: '../.env' });
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
-require('dotenv').config();
 
 const locationRoutes = require('./routes/locationRoutes');
 const narrativeRoutes = require('./routes/narrativeRoutes');
 const cultureRoutes = require('./routes/cultureRoutes');
 const climateRoutes = require('./routes/climateRoutes');
 const indigenousRoutes = require('./routes/indigenousRoutes');
+const weatherRoutes = require('./routes/weatherRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Log environment variables (without exposing keys)
+console.log('Environment check:');
+console.log('GROQ_API_KEY:', process.env.GROQ_API_KEY ? 'Set' : 'Missing');
+console.log('TASTEDIVE_API_KEY:', process.env.TASTEDIVE_API_KEY ? 'Set' : 'Missing');
+console.log('TAVILY_API_KEY:', process.env.TAVILY_API_KEY ? 'Set' : 'Missing');
 
 // Middleware
 app.use(helmet());
@@ -27,10 +34,42 @@ app.use('/api/narrative', narrativeRoutes);
 app.use('/api/culture', cultureRoutes);
 app.use('/api/climate', climateRoutes);
 app.use('/api/indigenous', indigenousRoutes);
+app.use('/api/weather', weatherRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
+});
+
+// Test API endpoints
+app.get('/api/test/groq', async (req, res) => {
+  try {
+    const groqService = require('./services/groqService');
+    const result = await groqService.generateNarrative('Sydney', 'test');
+    res.json({ success: true, data: result });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/test/tavily', async (req, res) => {
+  try {
+    const tavilyService = require('./services/tavilyService');
+    const result = await tavilyService.getClimateData(-33.8688, 151.2093, 'current');
+    res.json({ success: true, data: result });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/test/tastedive', async (req, res) => {
+  try {
+    const tasteDiveService = require('./services/tasteDiveService');
+    const result = await tasteDiveService.getCulturalRecommendations('Sydney');
+    res.json({ success: true, data: result });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
 });
 
 // Error handling middleware

@@ -1,51 +1,52 @@
+const climateEventsService = require('../services/climateEventsService');
 const tavilyService = require('../services/tavilyService');
 
-const getClimateData = async (req, res) => {
+const getAllClimateEvents = async (req, res) => {
   try {
-    const { lat, lon, timeframe = 'both' } = req.query;
-    
-    if (!lat || !lon) {
-      return res.status(400).json({ error: 'Latitude and longitude are required' });
-    }
-
-    const climateData = await tavilyService.getClimateData(lat, lon, timeframe);
-    
-    res.json(climateData);
-  } catch (error) {
-    console.error('Climate data error:', error.message);
-    res.status(500).json({ error: 'Failed to get climate data' });
-  }
-};
-
-const getClimateComparison = async (req, res) => {
-  try {
-    const { lat, lon } = req.query;
-    
-    if (!lat || !lon) {
-      return res.status(400).json({ error: 'Latitude and longitude are required' });
-    }
-
-    const [pastData, futureData] = await Promise.all([
-      tavilyService.getHistoricalClimate(lat, lon),
-      tavilyService.getFutureClimate(lat, lon)
-    ]);
+    const events = await climateEventsService.getAllClimateEvents();
     
     res.json({
-      past: pastData,
-      future: futureData,
-      comparison: {
-        temperatureChange: futureData.temperature - pastData.temperature,
-        rainfallChange: futureData.rainfall - pastData.rainfall,
-        windChange: futureData.wind_speed - pastData.wind_speed
+      success: true,
+      events: events,
+      metadata: {
+        totalEvents: events.length,
+        eventTypes: {
+          bushfires: events.filter(e => e.type === 'bushfires').length,
+          floods: events.filter(e => e.type === 'floods').length,
+          droughts: events.filter(e => e.type === 'droughts').length
+        },
+        timestamp: new Date().toISOString()
       }
     });
   } catch (error) {
-    console.error('Climate comparison error:', error.message);
-    res.status(500).json({ error: 'Failed to get climate comparison' });
+    console.error('Error fetching all climate events:', error);
+    res.status(500).json({ error: 'Failed to fetch climate events' });
+  }
+};
+
+const getClimateEvents = async (req, res) => {
+  try {
+    const { location } = req.query;
+    
+    if (!location) {
+      return res.status(400).json({ error: 'Location parameter is required' });
+    }
+
+    const events = await tavilyService.getClimateEvents(location);
+    
+    res.json({
+      success: true,
+      events: events || [],
+      location: location,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Error fetching climate events:', error);
+    res.status(500).json({ error: 'Failed to fetch climate events' });
   }
 };
 
 module.exports = {
-  getClimateData,
-  getClimateComparison
+  getAllClimateEvents,
+  getClimateEvents
 };

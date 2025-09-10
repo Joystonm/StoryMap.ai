@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 
-const IndigenousQuiz = ({ questions = [], mode = 'quiz' }) => {
+const IndigenousQuiz = ({ questions = [], location, onRegenerateQuiz }) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
-  const [activeMode, setActiveMode] = useState(mode);
+  const [showFeedback, setShowFeedback] = useState(false);
 
   const handleAnswer = (answerIndex) => {
     setSelectedAnswer(answerIndex);
-    if (questions[currentQuestion]?.correct === answerIndex) {
+    setShowFeedback(true);
+    
+    if (questions[currentQuestion]?.correctAnswer === answerIndex) {
       setScore(score + 1);
     }
   };
@@ -18,6 +20,7 @@ const IndigenousQuiz = ({ questions = [], mode = 'quiz' }) => {
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
       setSelectedAnswer(null);
+      setShowFeedback(false);
     } else {
       setShowResult(true);
     }
@@ -28,196 +31,54 @@ const IndigenousQuiz = ({ questions = [], mode = 'quiz' }) => {
     setSelectedAnswer(null);
     setScore(0);
     setShowResult(false);
+    setShowFeedback(false);
   };
 
-  // Language Learning Content
-  const languageWords = [
-    { word: 'Yurrampi', meaning: 'Honey ant', language: 'Warlpiri' },
-    { word: 'Billabong', meaning: 'Waterhole', language: 'Wiradjuri' },
-    { word: 'Corroboree', meaning: 'Sacred ceremony', language: 'Various' },
-    { word: 'Tjukurpa', meaning: 'Dreamtime law', language: 'Pitjantjatjara' }
-  ];
-
-  // Dreamtime Stories
-  const dreamtimeStories = [
-    {
-      title: 'The Rainbow Serpent',
-      preview: 'Long ago, the Rainbow Serpent slept beneath the earth...',
-      region: 'Northern Australia'
-    },
-    {
-      title: 'How the Kangaroo Got Its Tail',
-      preview: 'In the Dreamtime, all animals looked very different...',
-      region: 'Central Australia'
-    }
-  ];
-
-  if (activeMode === 'language') {
-    return (
-      <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg overflow-hidden">
-        <div className="bg-gradient-to-r from-purple-500 to-indigo-500 p-4 text-white">
-          <h3 className="text-xl font-bold mb-1">Language Revival</h3>
-          <p className="text-purple-100 text-sm">Learn First Nations words and phrases</p>
-        </div>
-
-        <div className="flex border-b border-gray-200 bg-gray-50">
-          <button
-            onClick={() => setActiveMode('quiz')}
-            className="flex-1 py-3 px-4 text-sm font-medium text-gray-500 hover:text-gray-700"
-          >
-            🧠 Quiz
-          </button>
-          <button
-            onClick={() => setActiveMode('language')}
-            className="flex-1 py-3 px-4 text-sm font-medium text-purple-600 border-b-2 border-purple-600 bg-white"
-          >
-            🗣️ Language
-          </button>
-          <button
-            onClick={() => setActiveMode('stories')}
-            className="flex-1 py-3 px-4 text-sm font-medium text-gray-500 hover:text-gray-700"
-          >
-            📚 Stories
-          </button>
-        </div>
-
-        <div className="p-6">
-          <h4 className="font-semibold text-gray-800 mb-4">Word of the Day</h4>
-          <div className="space-y-4">
-            {languageWords.map((item, index) => (
-              <div key={index} className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg p-4 border-l-4 border-purple-500">
-                <div className="flex justify-between items-start mb-2">
-                  <h5 className="text-lg font-bold text-purple-800">{item.word}</h5>
-                  <span className="text-xs text-purple-600 bg-purple-100 px-2 py-1 rounded">{item.language}</span>
-                </div>
-                <p className="text-purple-700">{item.meaning}</p>
-                <button className="mt-2 text-sm text-purple-600 hover:text-purple-800 flex items-center">
-                  🔊 Listen to pronunciation
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (activeMode === 'stories') {
-    return (
-      <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg overflow-hidden">
-        <div className="bg-gradient-to-r from-orange-500 to-yellow-500 p-4 text-white">
-          <h3 className="text-xl font-bold mb-1">Dreamtime Stories</h3>
-          <p className="text-orange-100 text-sm">Ancient stories that shaped the land</p>
-        </div>
-
-        <div className="flex border-b border-gray-200 bg-gray-50">
-          <button
-            onClick={() => setActiveMode('quiz')}
-            className="flex-1 py-3 px-4 text-sm font-medium text-gray-500 hover:text-gray-700"
-          >
-            🧠 Quiz
-          </button>
-          <button
-            onClick={() => setActiveMode('language')}
-            className="flex-1 py-3 px-4 text-sm font-medium text-gray-500 hover:text-gray-700"
-          >
-            🗣️ Language
-          </button>
-          <button
-            onClick={() => setActiveMode('stories')}
-            className="flex-1 py-3 px-4 text-sm font-medium text-orange-600 border-b-2 border-orange-600 bg-white"
-          >
-            📚 Stories
-          </button>
-        </div>
-
-        <div className="p-6">
-          <div className="space-y-4">
-            {dreamtimeStories.map((story, index) => (
-              <div key={index} className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-lg p-4 border-l-4 border-orange-500">
-                <div className="flex justify-between items-start mb-2">
-                  <h5 className="text-lg font-bold text-orange-800">{story.title}</h5>
-                  <span className="text-xs text-orange-600 bg-orange-100 px-2 py-1 rounded">{story.region}</span>
-                </div>
-                <p className="text-orange-700 mb-3 italic">"{story.preview}"</p>
-                <button className="text-sm text-orange-600 hover:text-orange-800 font-medium">
-                  📖 Read full story →
-                </button>
-              </div>
-            ))}
-          </div>
-          
-          <div className="mt-6 text-center">
-            <button className="bg-gradient-to-r from-orange-500 to-yellow-500 text-white px-6 py-3 rounded-lg hover:from-orange-600 hover:to-yellow-600 transition-all">
-              🎧 Listen to Audio Stories
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Quiz Mode
   if (questions.length === 0) {
     return (
-      <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg p-6 text-center">
+      <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 text-center">
         <div className="text-4xl mb-4">🪃</div>
-        <h3 className="text-lg font-semibold text-gray-700 mb-2">Indigenous Knowledge Hub</h3>
-        <p className="text-gray-500 mb-4">Explore Aboriginal culture through interactive learning</p>
-        <div className="flex justify-center space-x-2">
-          <button
-            onClick={() => setActiveMode('language')}
-            className="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200"
-          >
-            🗣️ Learn Language
-          </button>
-          <button
-            onClick={() => setActiveMode('stories')}
-            className="px-4 py-2 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200"
-          >
-            📚 Read Stories
-          </button>
-        </div>
+        <h3 className="text-lg font-semibold text-gray-700 mb-2">No Quiz Available</h3>
+        <p className="text-gray-500">Please select a location to generate quiz questions.</p>
       </div>
     );
   }
 
   if (showResult) {
+    const percentage = Math.round((score / questions.length) * 100);
+    
     return (
-      <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg overflow-hidden">
-        <div className="bg-gradient-to-r from-green-500 to-emerald-500 p-4 text-white text-center">
-          <h3 className="text-xl font-bold mb-1">Quiz Complete! 🎉</h3>
-          <p className="text-green-100 text-sm">Your cultural knowledge score</p>
+      <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg overflow-hidden">
+        <div className="bg-gradient-to-r from-green-500 to-emerald-500 p-6 text-white text-center">
+          <h3 className="text-2xl font-bold mb-2">Quiz Complete! 🎉</h3>
+          <p className="text-green-100">Your knowledge of {location?.name} Indigenous culture</p>
         </div>
         
-        <div className="p-6 text-center">
-          <div className="text-4xl font-bold text-green-600 mb-2">
+        <div className="p-8 text-center">
+          <div className="text-6xl font-bold text-green-600 mb-4">
             {score}/{questions.length}
           </div>
-          <p className="text-gray-600 mb-6">
-            {score === questions.length ? 'Perfect! You\'re a cultural expert!' :
-             score >= questions.length * 0.7 ? 'Great job! Keep learning!' :
-             'Good start! There\'s more to discover!'}
+          <div className="text-2xl font-semibold text-gray-700 mb-2">
+            {percentage}% Correct
+          </div>
+          <p className="text-gray-600 mb-8">
+            {percentage >= 80 ? '🌟 Excellent! You have great knowledge of Indigenous culture!' :
+             percentage >= 60 ? '👍 Good job! Keep learning about Indigenous heritage!' :
+             '📚 Great start! There\'s so much more to discover!'}
           </p>
           
-          <div className="flex justify-center space-x-3">
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
             <button 
               onClick={resetQuiz}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+              className="px-6 py-3 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors font-medium"
             >
-              🔄 Try Again
+              🔄 Retake Quiz
             </button>
             <button
-              onClick={() => setActiveMode('language')}
-              className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600"
+              onClick={onRegenerateQuiz}
+              className="px-6 py-3 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors font-medium"
             >
-              🗣️ Learn Language
-            </button>
-            <button
-              onClick={() => setActiveMode('stories')}
-              className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
-            >
-              📚 Read Stories
+              ✨ Try Another Quiz
             </button>
           </div>
         </div>
@@ -226,78 +87,125 @@ const IndigenousQuiz = ({ questions = [], mode = 'quiz' }) => {
   }
 
   const question = questions[currentQuestion];
+  const isCorrect = selectedAnswer === question.correctAnswer;
 
   return (
-    <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg overflow-hidden">
-      <div className="bg-gradient-to-r from-indigo-500 to-purple-500 p-4 text-white">
-        <div className="flex justify-between items-center mb-2">
-          <h3 className="text-xl font-bold">Cultural Quiz</h3>
-          <span className="text-indigo-100 text-sm">
+    <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg overflow-hidden">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-orange-500 to-amber-500 p-6 text-white">
+        <div className="flex justify-between items-center mb-3">
+          <h3 className="text-xl font-bold">Indigenous Knowledge Quiz</h3>
+          <span className="text-orange-100 text-sm bg-white/20 px-3 py-1 rounded-full">
             {currentQuestion + 1} of {questions.length}
           </span>
         </div>
-        <div className="w-full bg-indigo-400 rounded-full h-2">
+        <div className="w-full bg-orange-400 rounded-full h-2">
           <div 
-            className="bg-white rounded-full h-2 transition-all duration-300"
+            className="bg-white rounded-full h-2 transition-all duration-500"
             style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
           ></div>
         </div>
+        {location && (
+          <p className="text-orange-100 text-sm mt-2">📍 {location.name}</p>
+        )}
       </div>
 
-      <div className="flex border-b border-gray-200 bg-gray-50">
-        <button
-          onClick={() => setActiveMode('quiz')}
-          className="flex-1 py-3 px-4 text-sm font-medium text-indigo-600 border-b-2 border-indigo-600 bg-white"
-        >
-          🧠 Quiz
-        </button>
-        <button
-          onClick={() => setActiveMode('language')}
-          className="flex-1 py-3 px-4 text-sm font-medium text-gray-500 hover:text-gray-700"
-        >
-          🗣️ Language
-        </button>
-        <button
-          onClick={() => setActiveMode('stories')}
-          className="flex-1 py-3 px-4 text-sm font-medium text-gray-500 hover:text-gray-700"
-        >
-          📚 Stories
-        </button>
-      </div>
-
-      <div className="p-6">
-        <h4 className="text-lg font-semibold mb-4 text-gray-800">{question.question}</h4>
-        <div className="space-y-3">
+      {/* Question */}
+      <div className="p-8">
+        <h4 className="text-xl font-semibold mb-6 text-gray-800 leading-relaxed">
+          {question.question}
+        </h4>
+        
+        {/* Answer Options */}
+        <div className="space-y-4 mb-6">
           {question.options?.map((option, index) => (
             <button
               key={index}
               onClick={() => handleAnswer(index)}
-              className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
-                selectedAnswer === index 
-                  ? selectedAnswer === question.correct
-                    ? 'bg-green-100 border-green-500 text-green-800'
-                    : 'bg-red-100 border-red-500 text-red-800'
-                  : 'hover:bg-gray-50 border-gray-200 hover:border-gray-300'
+              disabled={showFeedback}
+              className={`w-full text-left p-4 rounded-xl border-2 transition-all transform hover:scale-[1.02] ${
+                showFeedback
+                  ? selectedAnswer === index
+                    ? isCorrect
+                      ? 'bg-green-100 border-green-500 text-green-800 shadow-lg'
+                      : 'bg-red-100 border-red-500 text-red-800 shadow-lg'
+                    : index === question.correctAnswer
+                      ? 'bg-green-100 border-green-500 text-green-800 shadow-lg'
+                      : 'bg-gray-50 border-gray-200 text-gray-600'
+                  : 'hover:bg-orange-50 border-gray-200 hover:border-orange-300 hover:shadow-md'
               }`}
-              disabled={selectedAnswer !== null}
             >
               <div className="flex items-center">
-                <span className="w-6 h-6 rounded-full border-2 border-current mr-3 flex items-center justify-center text-xs font-bold">
-                  {String.fromCharCode(65 + index)}
+                <span className={`w-8 h-8 rounded-full border-2 mr-4 flex items-center justify-center text-sm font-bold ${
+                  showFeedback && selectedAnswer === index
+                    ? isCorrect
+                      ? 'border-green-500 bg-green-500 text-white'
+                      : 'border-red-500 bg-red-500 text-white'
+                    : showFeedback && index === question.correctAnswer
+                      ? 'border-green-500 bg-green-500 text-white'
+                      : 'border-current'
+                }`}>
+                  {showFeedback && selectedAnswer === index
+                    ? isCorrect ? '✓' : '✗'
+                    : showFeedback && index === question.correctAnswer
+                      ? '✓'
+                      : String.fromCharCode(65 + index)
+                  }
                 </span>
-                {option}
+                <span className="flex-1">{option}</span>
               </div>
             </button>
           ))}
         </div>
+
+        {/* Feedback */}
+        {showFeedback && (
+          <div className={`p-4 rounded-xl mb-6 ${
+            isCorrect ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
+          }`}>
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">
+                {isCorrect ? '🎉' : '📚'}
+              </span>
+              <div>
+                <h5 className={`font-semibold mb-2 ${
+                  isCorrect ? 'text-green-800' : 'text-red-800'
+                }`}>
+                  {isCorrect ? 'Correct!' : 'Not quite right'}
+                </h5>
+                <p className={`text-sm ${
+                  isCorrect ? 'text-green-700' : 'text-red-700'
+                }`}>
+                  {question.explanation || (isCorrect 
+                    ? 'Great job! You have good knowledge of Indigenous culture.'
+                    : `The correct answer is: ${question.options[question.correctAnswer]}`
+                  )}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
         
-        {selectedAnswer !== null && (
-          <div className="mt-6 text-center">
+        {/* Navigation */}
+        {showFeedback && (
+          <div className="text-center">
             <button
               onClick={nextQuestion}
-              className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-6 py-3 rounded-lg hover:from-indigo-600 hover:to-purple-600 transition-all"
+              className="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-8 py-3 rounded-xl hover:from-orange-600 hover:to-amber-600 transition-all font-medium shadow-lg transform hover:scale-105"
             >
               {currentQuestion < questions.length - 1 ? 'Next Question →' : 'Finish Quiz 🎉'}
+            </button>
+          </div>
+        )}
+
+        {/* Regenerate Button */}
+        {!showFeedback && (
+          <div className="text-center mt-6">
+            <button
+              onClick={onRegenerateQuiz}
+              className="text-orange-600 hover:text-orange-800 text-sm font-medium transition-colors"
+            >
+              ✨ Generate New Questions
             </button>
           </div>
         )}

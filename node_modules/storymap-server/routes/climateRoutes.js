@@ -1,9 +1,11 @@
 const express = require('express');
-const { getClimateData, getClimateComparison } = require('../controllers/climateController');
-
 const router = express.Router();
+const climateController = require('../controllers/climateController');
 
-router.get('/data', getClimateData);
-router.get('/comparison', getClimateComparison);
+// Get all climate events for map display
+router.get('/events/all', climateController.getAllClimateEvents);
+
+// Get climate events for specific location
+router.get('/events', climateController.getClimateEvents);
 
 module.exports = router;

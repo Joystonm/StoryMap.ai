@@ -18,6 +18,29 @@ const getIndigenousKnowledge = async (req, res) => {
   }
 };
 
+const generateLocationQuiz = async (req, res) => {
+  try {
+    const { location } = req.query;
+    
+    if (!location) {
+      return res.status(400).json({ error: 'Location parameter is required' });
+    }
+
+    console.log('Generating Indigenous quiz for:', location);
+
+    // First, get real cultural data from Tavily
+    const culturalData = await tavilyService.getIndigenousInformation(location, 'culture history traditions');
+    
+    // Then generate quiz questions using Groq with the real data
+    const quiz = await groqService.generateIndigenousQuiz(location, culturalData);
+    
+    res.json(quiz);
+  } catch (error) {
+    console.error('Location quiz generation error:', error.message);
+    res.status(500).json({ error: 'Failed to generate location-specific quiz' });
+  }
+};
+
 const generateQuiz = async (req, res) => {
   try {
     const { location, difficulty = 'medium', questionCount = 5 } = req.body;
@@ -47,5 +70,6 @@ const getLearningModules = async (req, res) => {
 module.exports = {
   getIndigenousKnowledge,
   generateQuiz,
+  generateLocationQuiz,
   getLearningModules
 };
